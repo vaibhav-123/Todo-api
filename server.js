@@ -1,8 +1,10 @@
 var express = require('express');
 var app = express();
+var bodyParser = require('body-parser');
+
 var PORT = process.env.PORT || 3000;
 
-var todos = [{
+/*var todos = [{
 	id: 1,
 	descrption: "Lunch",
 	completed: false
@@ -14,7 +16,13 @@ var todos = [{
 	id: 3,
 	descrption: "Homework",
 	completed: true
-}]
+}]*/
+
+var todos = [];
+var todoNextId = 1;
+
+// When json request comes in express parse it to json & we can access req.body
+app.use(bodyParser.json())
 
 app.get('/', function(req, res) {
 	res.send('Todo api root');
@@ -42,6 +50,16 @@ app.get('/todos/:id',function (req, res) {
 	if (flag == 0) {
 		res.status(404).send();
 	}
+})
+
+// Add todo item using POST 
+app.post('/todos',function (req, res){
+
+	var body = req.body;
+	body.id = todoNextId; 
+	todos.push(body);
+    todoNextId++;
+	res.json(todos[todoNextId - 2]);
 })
 
 app.listen(PORT, function(){
