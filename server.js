@@ -41,7 +41,7 @@ app.get('/todos/:id',function (req, res) {
 	var matchedElement = _.findWhere(todos, {id : todoId});
 
 	if (matchedElement) {
-		res.json(todos[todoId]);        
+		res.json(matchedElement);        
 	} else {
 		res.status(404).send();
 	}
@@ -73,12 +73,41 @@ app.delete('/todos/:id', function (req, res){
 	if(matchedElement) {
 
 		todos = _.without(todos, matchedElement);
-		console.log(todos);
 		res.json(matchedElement);
 	} else {
 		res.status(404).send();
 	}
 })
+
+// PUT /todos/:id
+app.put('/todos/:id', function (req, res) {
+
+	var todoId = parseInt(req.params.id, 10);
+	var matchedElement = _.findWhere(todos, {id : todoId});
+	var body = req.body;
+	var validAttributes = {};
+
+	if(!matchedElement) {
+		return res.status(404).send();
+	}
+
+	if(body.hasOwnProperty('completed') && _.isBoolean(body.completed)){
+		validAttributes.completed = body.completed;
+	} else if (body.hasOwnProperty('completed')) {
+		return res.status(400).send();
+	}
+
+	if(body.hasOwnProperty('description') && _.isString(body.description) && body.description.trim().length > 0){
+		validAttributes.description = body.description;
+	} else if (body.hasOwnProperty('description')) {
+		return res.status(400).send();
+	}
+    
+    // matched element gets modified
+	_.extend(matchedElement, validAttributes);
+	res.json(matchedElement);
+
+});
 
 app.listen(PORT, function(){
 	console.log('Express listening on port : ' + PORT + ' !');
