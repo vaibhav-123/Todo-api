@@ -29,12 +29,12 @@ app.get('/', function(req, res) {
 	res.send('Todo api root');
 });
 
-// Get all todo items
+// GET /todos (Get all todo items)
 app.get('/todos',function (req, res) {
 	res.json(todos);
 })
 
-// Get todo items of given id
+// GET /todos/:id (Get todo items of given id)
 app.get('/todos/:id',function (req, res) {
 	
 	var todoId = parseInt(req.params.id, 10);
@@ -47,7 +47,7 @@ app.get('/todos/:id',function (req, res) {
 	}
 })
 
-// Add todo item using POST 
+// POST /todos (Add todo item using POST) 
 app.post('/todos',function (req, res){
 	
 	var body = req.body;
@@ -62,6 +62,21 @@ app.post('/todos',function (req, res){
 		body.id = todoNextId++; 
 		todos.push(body);
 		res.json(todos[todoNextId - 2]);
+	}
+})
+
+// DELETE /todos/:id
+app.delete('/todos/:id', function (req, res){
+	var todoId = parseInt(req.params.id, 10);
+	var matchedElement = _.findWhere(todos, {id : todoId});
+
+	if(matchedElement) {
+
+		todos = _.without(todos, matchedElement);
+		console.log(todos);
+		res.json(matchedElement);
+	} else {
+		res.status(404).send();
 	}
 })
 
