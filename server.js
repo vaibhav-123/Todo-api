@@ -64,8 +64,6 @@ app.get('/todos/:id',function (req, res) {
 app.post('/todos',function (req, res){
 	
 	var body = req.body;
-
-	console.log(body);
 	db.todo.create(body).then(function(todo){
 		res.json(todo.toJSON());
 	},function(e){
@@ -122,6 +120,18 @@ app.put('/todos/:id', function (req, res) {
     },function(e) {
     	res.status(500).send();
     });
+});
+
+// POST /users (Add user using POST) 
+app.post('/users',function (req, res){
+	
+	var body = _.pick(req.body, 'email', 'password');
+
+	db.user.create(body).then(function(user){
+		res.json(user.toJSON());
+	},function(e){
+		res.status(400).json(e);
+	});
 });
 
 db.sequelize.sync().then(function(){
