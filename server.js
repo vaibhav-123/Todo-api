@@ -171,7 +171,8 @@ app.delete('/todos/:id', function (req, res){
 // PUT /todos/:id
 app.put('/todos/:id', function (req, res) {
 
-	var todoId = parseInt(req.params.id, 10);
+	// Without database
+	/*var todoId = parseInt(req.params.id, 10);
 	var matchedElement = _.findWhere(todos, {id : todoId});
 	var body = req.body;
 	var validAttributes = {};
@@ -194,8 +195,35 @@ app.put('/todos/:id', function (req, res) {
     
     // matched element gets modified
 	_.extend(matchedElement, validAttributes);
-	res.json(matchedElement);
+	res.json(matchedElement);*/
 
+	// with database
+	var todoId = parseInt(req.params.id, 10);
+	var body = req.body;
+	var attributes = {};
+
+	if(body.hasOwnProperty('completed')){
+		attributes.completed = body.completed;
+	} 
+	if(body.hasOwnProperty('description')){
+		attributes.description = body.description;
+	} 
+    
+    db.todo.findById(todoId).then(function(todo){
+    	if(todo) {
+   			// call to another promise
+    		todo.update(attributes).then(function(todo){
+	    	
+		    	res.json(todo.toJSON());	   
+		    },function(e) {
+		    	res.status(400).json(e);
+		    });
+    	} else {
+    		res.status(404).send();
+    	}
+    },function(e) {
+    	res.status(500).send();
+    });
 });
 
 db.sequelize.sync().then(function(){
