@@ -19,29 +19,6 @@ app.get('/', function(req, res) {
 // Query parameters
 app.get('/todos',function (req, res) {
 	
-	// Without database
-	/*var queryParams = req.query;
-	var filteredTodos = todos;
-
-	if(queryParams.hasOwnProperty('completed') && queryParams.completed === 'true') {
-
-		filteredTodos = _.where(todos, {completed : true});
-
-	} else if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'false') {
-
-		filteredTodos = _.where(todos, {completed : false});
-	}
-
-	if(queryParams.hasOwnProperty('q') && queryParams.q.length > 0) {
-
-		filteredTodos = _.filter(filteredTodos, function(todo) {
-			return todo.description.indexOf(queryParams.q) > -1;
-		});
-	} 	
-
-	res.json(filteredTodos);*/
-
-	// With database
 	var queryParams = req.query;
 	var where = {};
 
@@ -71,17 +48,6 @@ app.get('/todos',function (req, res) {
 // GET /todos/:id (Get todo items of given id)
 app.get('/todos/:id',function (req, res) {
 	
-	// without database
-	/*var todoId = parseInt(req.params.id, 10);
-	var matchedElement = _.findWhere(todos, {id : todoId});
-
-	if (matchedElement) {
-		res.json(matchedElement);        
-	} else {
-		res.status(404).send();
-	}*/
-
-	// With database
 	var todoId = parseInt(req.params.id, 10);
 	db.todo.findById(todoId).then(function(todo){
 		if(todo) {
@@ -98,23 +64,7 @@ app.get('/todos/:id',function (req, res) {
 app.post('/todos',function (req, res){
 	
 	var body = req.body;
-	
-	// without database
 
-	/*// .pick is used to access  completed & description fields
-	body = _.pick(body, 'completed', 'description');
-
-	if(!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0) {
-		// Bad request
-		res.status(400).send();
-	} else {
-		body.description = body.description.trim();
-		body.id = todoNextId++; 
-		todos.push(body);
-		res.json(todos[todoNextId - 2]);
-	}*/
-
-	// with database
 	console.log(body);
 	db.todo.create(body).then(function(todo){
 		res.json(todo.toJSON());
@@ -126,31 +76,6 @@ app.post('/todos',function (req, res){
 // DELETE /todos/:id
 app.delete('/todos/:id', function (req, res){
 	
-	// Without database
-	/*var todoId = parseInt(req.params.id, 10);
-	var matchedElement = _.findWhere(todos, {id : todoId});
-
-	if(matchedElement) {
-
-		todos = _.without(todos, matchedElement);
-		res.json(matchedElement);
-	} else {
-		res.status(404).send();
-	}*/
-
-	// With database
-	/*var todoId = parseInt(req.params.id, 10);
-	db.todo.findById(todoId).then(function(todo){
-		if(todo) {
-			// Delete entry
-			res.json(todo.toJSON());	
-		} else {
-			res.status(404).send();
-		}		
-	}, function(e){
-		res.status(500).send();
-	});	*/
-
 	var todoId = parseInt(req.params.id, 10);
 	db.todo.destroy({
 	   where: {
@@ -171,33 +96,6 @@ app.delete('/todos/:id', function (req, res){
 // PUT /todos/:id
 app.put('/todos/:id', function (req, res) {
 
-	// Without database
-	/*var todoId = parseInt(req.params.id, 10);
-	var matchedElement = _.findWhere(todos, {id : todoId});
-	var body = req.body;
-	var validAttributes = {};
-
-	if(!matchedElement) {
-		return res.status(404).send();
-	}
-
-	if(body.hasOwnProperty('completed') && _.isBoolean(body.completed)){
-		validAttributes.completed = body.completed;
-	} else if (body.hasOwnProperty('completed')) {
-		return res.status(400).send();
-	}
-
-	if(body.hasOwnProperty('description') && _.isString(body.description) && body.description.trim().length > 0){
-		validAttributes.description = body.description;
-	} else if (body.hasOwnProperty('description')) {
-		return res.status(400).send();
-	}
-    
-    // matched element gets modified
-	_.extend(matchedElement, validAttributes);
-	res.json(matchedElement);*/
-
-	// with database
 	var todoId = parseInt(req.params.id, 10);
 	var body = req.body;
 	var attributes = {};
