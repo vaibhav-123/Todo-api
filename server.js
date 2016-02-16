@@ -1,25 +1,10 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
-var _ = require('underscore');
 var db = require('./db.js');
+var _ = require('underscore');
 
 var PORT = process.env.PORT || 3000;
-
-/*var todos = [{
-	id: 1,
-	descrption: "Lunch",
-	completed: false
-}, {
-	id: 2,
-	descrption: "Go to market",
-	completed: false
-}, {
-	id: 3,
-	descrption: "Homework",
-	completed: true
-}]*/
-
 var todos = [];
 var todoNextId = 1;
 
@@ -81,7 +66,7 @@ app.get('/todos',function (req, res) {
 	}, function(e){
 		res.status(500).send();
 	});
-})
+});
 
 // GET /todos/:id (Get todo items of given id)
 app.get('/todos/:id',function (req, res) {
@@ -136,7 +121,7 @@ app.post('/todos',function (req, res){
 	},function(e){
 		res.status(400).send();
 	});
-})
+});
 
 // DELETE /todos/:id
 app.delete('/todos/:id', function (req, res){
@@ -150,7 +135,7 @@ app.delete('/todos/:id', function (req, res){
 	} else {
 		res.status(404).send();
 	}
-})
+});
 
 // PUT /todos/:id
 app.put('/todos/:id', function (req, res) {
