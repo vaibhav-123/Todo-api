@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var _ = require('underscore');
+var db = require('./db.js');
 
 var PORT = process.env.PORT || 3000;
 
@@ -46,6 +47,7 @@ app.get('/todos',function (req, res) {
 	}
 
 	if(queryParams.hasOwnProperty('q') && queryParams.q.length > 0) {
+
 		filteredTodos = _.filter(filteredTodos, function(todo) {
 			return todo.description.indexOf(queryParams.q) > -1;
 		});
@@ -71,7 +73,10 @@ app.get('/todos/:id',function (req, res) {
 app.post('/todos',function (req, res){
 	
 	var body = req.body;
-	// .pick is used to access  completed & description fields
+	
+	// without database
+
+	/*// .pick is used to access  completed & description fields
 	body = _.pick(body, 'completed', 'description');
 
 	if(!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0) {
@@ -82,7 +87,15 @@ app.post('/todos',function (req, res){
 		body.id = todoNextId++; 
 		todos.push(body);
 		res.json(todos[todoNextId - 2]);
-	}
+	}*/
+
+	// with database
+	console.log(body);
+	db.todo.create(body).then(function(todo){
+		res.json(todo.toJSON());
+	},function(e){
+		res.status(400).send();
+	});
 })
 
 // DELETE /todos/:id
@@ -129,6 +142,9 @@ app.put('/todos/:id', function (req, res) {
 
 });
 
-app.listen(PORT, function(){
-	console.log('Express listening on port : ' + PORT + ' !');
+db.sequelize.sync().then(function(){
+
+	app.listen(PORT, function(){
+		console.log('Express listening on port : ' + PORT + ' !');
+	});	
 });
