@@ -125,7 +125,9 @@ app.post('/todos',function (req, res){
 
 // DELETE /todos/:id
 app.delete('/todos/:id', function (req, res){
-	var todoId = parseInt(req.params.id, 10);
+	
+	// Without database
+	/*var todoId = parseInt(req.params.id, 10);
 	var matchedElement = _.findWhere(todos, {id : todoId});
 
 	if(matchedElement) {
@@ -134,7 +136,36 @@ app.delete('/todos/:id', function (req, res){
 		res.json(matchedElement);
 	} else {
 		res.status(404).send();
-	}
+	}*/
+
+	// With database
+	/*var todoId = parseInt(req.params.id, 10);
+	db.todo.findById(todoId).then(function(todo){
+		if(todo) {
+			// Delete entry
+			res.json(todo.toJSON());	
+		} else {
+			res.status(404).send();
+		}		
+	}, function(e){
+		res.status(500).send();
+	});	*/
+
+	var todoId = parseInt(req.params.id, 10);
+	db.todo.destroy({
+	   where: {
+	      id: todoId //this will be your id that you want to delete
+	   }
+	}).then(function(rowDeleted){ // rowDeleted will return number of rows deleted	
+	   	console.log(rowDeleted);
+	   	if(rowDeleted === 0){
+	   		res.status(404).send();
+   		} else {
+   			res.status(200).send();  
+   		}	 	
+	}, function(e){
+	    res.status(500).send(); 
+	});
 });
 
 // PUT /todos/:id
