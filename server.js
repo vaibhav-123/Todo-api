@@ -59,15 +59,28 @@ app.get('/todos',function (req, res) {
 // GET /todos/:id (Get todo items of given id)
 app.get('/todos/:id',function (req, res) {
 	
-	var todoId = parseInt(req.params.id, 10);
+	// without database
+	/*var todoId = parseInt(req.params.id, 10);
 	var matchedElement = _.findWhere(todos, {id : todoId});
 
 	if (matchedElement) {
 		res.json(matchedElement);        
 	} else {
 		res.status(404).send();
-	}
-})
+	}*/
+
+	// With database
+	var todoId = parseInt(req.params.id, 10);
+	db.todo.findById(todoId).then(function(todo){
+		if(todo) {
+			res.json(todo.toJSON());	
+		} else {
+			res.status(404).send();
+		}		
+	}, function(e){
+		res.status(500).send();
+	});	
+});
 
 // POST /todos (Add todo item using POST) 
 app.post('/todos',function (req, res){
