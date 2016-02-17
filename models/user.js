@@ -1,4 +1,6 @@
 var crypto = require('crypto');
+var cryptojs = require('crypto-js');
+var jwt = require('jsonwebtoken');
 var randomString = require("randomstring");
 var _ = require('underscore');
 
@@ -83,6 +85,25 @@ var user = sequelize.define('user', {
 			toPublicJSON: function() {
 				var json = this.toJSON();
 				return _.pick(json, 'id', 'email', 'createdAt', 'updatedAt');
+			},
+			generateToken: function(type){
+				if(!_.isString(type)) {
+					return undefined;
+				}
+
+				try {
+					// create jwt
+					var stringData = JSON.stringify({id: this.get('id'), type: type});
+					var encryptedData = cryptojs.AES.encrypt(stringData, 'abc123').toString();
+
+					var token = jwt.sign({
+						token: encryptedData
+					}, 'qwerty098');
+					return token;
+
+				} catch (err) {
+					return undefined;
+				}
 			}
 		}
 	});
