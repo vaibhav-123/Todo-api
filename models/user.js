@@ -4,7 +4,7 @@ var _ = require('underscore');
 
 module.exports = function(sequelize, DataTypes) {
 
-return	sequelize.define('user', {
+var user = sequelize.define('user', {
 		email: {
 			type: DataTypes.STRING,
 			allowNull: false,
@@ -44,6 +44,41 @@ return	sequelize.define('user', {
 				}	
 			}
 		},
+		classMethods: {
+			authenticate: function(body){
+				return new Promise(function(resolve, reject){
+
+					if(typeof body.email === 'string' && typeof body.password === 'string') {
+ 		
+				 		user.findOne({
+				 			where: {
+				 				email: body.email
+				 			}
+				 		}).then(function(user){
+
+				            if(!user) {
+				            	return reject();
+				            }  
+
+				            // create hash of password
+				            var secret = user.salt;    
+							var hash = crypto.createHmac('sha256', secret).update(body.password).digest('hex');
+										
+				 			if(hash === user.password_hash){
+				 				return resolve(user);
+				 			} else {
+				 				return reject();
+				 			}
+				 		},function(e) {
+				 			return reject();
+				 		});
+
+					} else {
+						return reject();
+					}
+				})		
+			}
+		},
 		instanceMethods: {
 			toPublicJSON: function() {
 				var json = this.toJSON();
@@ -51,4 +86,6 @@ return	sequelize.define('user', {
 			}
 		}
 	});
+
+	return user;
 };	
