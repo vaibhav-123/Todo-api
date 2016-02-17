@@ -20,11 +20,42 @@ var Todo = sequelize.define('todo', {
 	}
 });
 
+var User = sequelize.define('user', {
+	email: Sequelize.STRING
+})
+
+Todo.belongsTo(User);
+User.hasMany(Todo);
 // {force: true} property drops all tables create new
 sequelize.sync({force: true}).then(function() {
-	console.log('Every is synced');
+	
+	console.log('1st call..........................');
+	
+	User.create({
+		email: "vr@example.com"	
+	}).then(function(){
+		return Todo.create({
+			description: 'Feed the dog',
+			completed: false
+		})
+	}).then(function(todo){
+		User.findById(1).then(function(user){
+				user.addTodo(todo);
+				User.findById(1).then(function(user){
+			
+				user.getTodos().then(function(todos){
+					todos.forEach(function(todo){
+						console.log(todo.toJSON());
+					})
+				});	
+			})
+		})
+	});
 
-	// insert into table
+    console.log('2nd call..........................');
+	
+
+	/*// insert into table
 	Todo.create({
 		description: 'Feed the dog'
 		//completed: false
@@ -52,5 +83,5 @@ sequelize.sync({force: true}).then(function() {
 		}
 	}).catch(function(e){
 		console.log(e);
-	});
+	});*/
 });
